@@ -1,1 +1,0 @@
-const req = new XMLHttpRequest();
