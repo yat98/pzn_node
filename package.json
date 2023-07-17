@@ -4,6 +4,10 @@
   "description": "Belajar NodeJS NPM",
   "main": "index.js",
   "scripts": {
+    "prestart": "echo \"Before application start\"", 
+    "start": "node index.js", 
+    "poststart": "echo \"After application start\"", 
+    "run": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
