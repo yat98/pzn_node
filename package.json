@@ -18,6 +18,7 @@
   ],
   "author": "Hidayat Chandra",
   "license": "ISC",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/yat98/pzn_node/issues"
   },
