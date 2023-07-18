@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/yat98/pzn_node/issues"
   },
-  "homepage": "https://github.com/yat98/pzn_node#readme"
+  "homepage": "https://github.com/yat98/pzn_node#readme",
+  "dependencies": {
+    "lodash": "4.17.21"
+  }
 }
