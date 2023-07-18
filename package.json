@@ -2,7 +2,10 @@
   "name": "belajar-nodejs-npm",
   "version": "1.0.0",
   "description": "Belajar NodeJS NPM",
-  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./write": "./write.js"
+  },
   "scripts": {
     "prestart": "echo \"Before application start\"", 
     "start": "node index.js", 
