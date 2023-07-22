@@ -31,7 +31,8 @@
   },
   "homepage": "https://github.com/yat98/pzn_node#readme",
   "dependencies": {
-    "lodash": "~4.17.19"
+    "lodash": "~4.17.19",
+    "yat98-belajar-nodejs-npm-library": "^1.0.0"
   },
   "devDependencies": {
     "moment": "^2.29.3"
