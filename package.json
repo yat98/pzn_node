@@ -1,0 +1,19 @@
+{
+  "name": "belajar-nodejs-unit-test",
+  "version": "1.0.0",
+  "description": "Belajar NodeJS Unit Test",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yat98/pzn_node.git"
+  },
+  "author": "Hidayat Chandra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yat98/pzn_node/issues"
+  },
+  "homepage": "https://github.com/yat98/pzn_node#readme"
+}
