@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Belajar NodeJS Unit Test",
   "main": "./src/index.js",
+  "type": "module",
   "scripts": {
-    "test": "jest"
+    "test": "jest "
   },
   "repository": {
     "type": "git",
