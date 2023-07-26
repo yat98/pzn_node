@@ -5,12 +5,7 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
-    "test": "jest "
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    }
+    "test": "jest"
   },
   "repository": {
     "type": "git",
