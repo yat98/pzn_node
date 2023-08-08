@@ -3,7 +3,7 @@ import express from 'express';
 import request from 'supertest';
 
 const app = express();
-// app.use(express.json());
+app.use(express.json());
 app.use(cookieParser());
 
 test('test cookie', async () => {
