@@ -31,4 +31,12 @@ test('test mustache section data', async () => {
     }
   });
   expect(data).toContain('Hello Person Hidayat!');
+})
+
+test('test mustache inverted section data', async () => {
+  const helloTemplate = await fs.readFile('./templates/person_data.mustache')
+    .then(data => data.toString());
+
+  const data = Mustache.render(helloTemplate,{});
+  expect(data).toContain('Hello Guest');
 });
