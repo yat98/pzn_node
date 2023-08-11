@@ -20,8 +20,18 @@ model Customer{
   name String
   email String @unique
   phone String @unique
+  wallet Wallet?
 
   @@map("customers")
+}
+
+model Wallet{
+  id String @id
+  balance Int
+  customer Customer @relation(fields: [customer_id], references: [id])
+  customer_id String @unique
+
+  @@map("wallet")
 }
 
 model Product{
