@@ -21,8 +21,17 @@ model Customer{
   email String @unique
   phone String @unique
   wallet Wallet?
-
+  comments Comment[]
   @@map("customers")
+}
+
+model Comment{
+  id Int @id @default(autoincrement())
+  customer_id String @db.VarChar(100)
+  customer Customer @relation(fields: [customer_id], references: [id])
+  title String @db.VarChar(200)
+  description String? @db.Text()
+  @@map("comments")
 }
 
 model Wallet{
@@ -30,7 +39,6 @@ model Wallet{
   balance Int
   customer Customer @relation(fields: [customer_id], references: [id])
   customer_id String @unique
-
   @@map("wallet")
 }
 
