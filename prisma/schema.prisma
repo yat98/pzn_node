@@ -22,12 +22,14 @@ model Customer{
   phone String @unique
   wallet Wallet?
   comments Comment[]
+  likes Like[]
+  loves Product[] @relation("loves")
   @@map("customers")
 }
 
 model Comment{
   id Int @id @default(autoincrement())
-  customer_id String @db.VarChar(100)
+  customer_id String
   customer Customer @relation(fields: [customer_id], references: [id])
   title String @db.VarChar(200)
   description String? @db.Text()
@@ -48,8 +50,18 @@ model Product{
   price Int @db.Int
   stock Int @db.SmallInt
   category String @db.VarChar(100)
-
+  likeBy Like[]
+  lovedBy Customer[] @relation("loves")
   @@map("products")
+}
+
+model Like{
+  customer_id String @db.VarChar(100)
+  product_id String @db.VarChar(100)
+  customer Customer @relation(fields: [customer_id],references: [id])
+  product Product @relation(fields: [product_id],references: [id])
+  @@id([customer_id,product_id])
+  @@map("likes")
 }
 
 model Category{

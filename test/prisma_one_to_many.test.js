@@ -41,19 +41,20 @@ describe('Prisma client', () => {
   });
   it('should be findMany', async() => {
     const customer = await prismaClient.customer.findMany({
-      where: {
+      include: {
         comments: {
-          none: {
-            title: {
-              contains: 'Comment'
-              // equals: 'Comment 1'
-            }
+          where: {
+            title: 'Comment 1'
           }
         }
       },
-      include: {
-        comments: true
-      }
+      where: {
+        comments: {
+          some: {
+            title: 'Comment 1'
+          }
+        }
+      },
     });
 
     console.info(JSON.stringify(customer));
