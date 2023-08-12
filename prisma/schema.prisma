@@ -19,7 +19,7 @@ model Comment {
   customer_id String    @db.VarChar(100)
   title       String    @db.VarChar(200)
   description String?   @db.Text
-  customers   customers @relation(fields: [customer_id], references: [id])
+  customers   Customer @relation(fields: [customer_id], references: [id])
 
   @@index([customer_id], map: "comments_customer_id_fkey")
   @@map("comments")
@@ -28,7 +28,7 @@ model Comment {
 model Likes {
   customer_id String    @db.VarChar(100)
   product_id  String    @db.VarChar(100)
-  customers   customers @relation(fields: [customer_id], references: [id])
+  customers   Customer @relation(fields: [customer_id], references: [id])
   products    Product   @relation(fields: [product_id], references: [id])
 
   @@id([customer_id, product_id])
@@ -43,7 +43,7 @@ model Product {
   stock     Int         @db.SmallInt
   category  String      @db.VarChar(100)
   likes     Likes[]
-  customers customers[] @relation("loves")
+  customers Customer[] @relation("loves")
 
   @@map("products")
 }
@@ -61,12 +61,12 @@ model Wallet {
   id          String    @id @db.VarChar(100)
   balance     Int
   customer_id String    @unique @db.VarChar(100)
-  customers   customers @relation(fields: [customer_id], references: [id])
+  customers   Customer @relation(fields: [customer_id], references: [id])
 
   @@map("wallet")
 }
 
-model customers {
+model Customer {
   id       String    @id @db.VarChar(100)
   name     String    @db.VarChar(100)
   email    String    @unique @db.VarChar(100)
@@ -75,4 +75,6 @@ model customers {
   likes    Likes[]
   wallet   Wallet?
   products Product[] @relation("loves")
+
+  @@map("customers")
 }
