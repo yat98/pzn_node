@@ -5,6 +5,7 @@ const validate = (schema, req) => {
     abortEarly: false,
     allowUnknown: false,
   });
+  
   if(result.error) throw new ResponseError(422,result.error);
   return result.value;
 }
