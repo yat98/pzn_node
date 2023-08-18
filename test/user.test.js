@@ -1,7 +1,6 @@
 import supertest from "supertest";
 import { web } from "../src/applications/web.js";
-import { prismaClient } from "../src/applications/database.js";
-import { createTestUser, removeTestUser } from "./test-util.js";
+import { createTestUser, removeTestUser } from "./utils/test-util.js";
 
 describe('POST /api/users', () => {
   afterEach(async () => {
@@ -108,5 +107,64 @@ describe('POST /api/users/login', () => {
       expect(result.status).toBe(401);
       expect(result.body.errors).toBeDefined();
       expect(result.body.errors).toBe('Username or password wrong');
+  });
+});
+
+describe('GET /api/users/current', () => {
+  beforeAll(async () => {
+    await createTestUser();
+  });
+
+  afterAll(async () => {
+    await removeTestUser();
+  });
+
+  it('should can get current user', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/users/current')
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe('test');
+  });
+
+  it('should reject if token invalid', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/users/current')
+      .set('Authorization', 'f60ba460-883d-46f2-a736-299430bb04e1');
+    
+    expect(result.body);
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.errors).toBe('Unauthorized');
+  });
+
+  it('should reject if not have token', async () => {
+    let result = await supertest(web)
+      .get('/api/users/current');
+      
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.errors).toBe('Unauthorized');
   });
 });

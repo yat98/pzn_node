@@ -1,4 +1,4 @@
-import { prismaClient } from "../src/applications/database.js";
+import { prismaClient } from "../../src/applications/database.js";
 import bcrypt from 'bcrypt';
 
 const removeTestUser = async() => {

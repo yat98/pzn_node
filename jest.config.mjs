@@ -21,14 +21,18 @@ const config = {
   // collectCoverage: false,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  // collectCoverageFrom: undefined,
+  collectCoverageFrom: [
+    'src/**/*.js',
+    '!src/main.js',
+    '!test/utils/*.js',
+  ],
 
   // The directory where Jest should output its coverage files
   // coverageDirectory: undefined,
 
   // An array of regexp pattern strings used to skip coverage collection
   // coveragePathIgnorePatterns: [
-  //   "/node_modules/"
+  //   "test/utils/test-util.js",
   // ],
 
   // Indicates which provider should be used to instrument code for coverage
@@ -161,7 +165,7 @@ const config = {
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
-  //   "/node_modules/"
+  //   "test/utils/test-util.js",
   // ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files

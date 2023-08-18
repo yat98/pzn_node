@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { prismaClient } from '../applications/database.js';
 import { validate } from '../validations/validation.js';
 import { ResponseError } from '../errors/response-error.js';
-import { loginUserValidation, registerUserValidation } from '../validations/user-validation.js';
+import { getUserValidation, loginUserValidation, registerUserValidation } from '../validations/user-validation.js';
 import { v4 as uuid } from 'uuid';
 
 const register = async (req) => {
@@ -59,7 +59,17 @@ const login = async (req) => {
   });
 }
 
+const get = async (username) => {
+  username = validate(getUserValidation,username);
+  return prismaClient.user.findUnique({
+    where: {
+      username: username
+    }
+  });
+}
+
 export default {
   register,
   login,
+  get,
 }
