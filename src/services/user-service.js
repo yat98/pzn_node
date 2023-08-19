@@ -101,9 +101,25 @@ const update = async (req) => {
   });
 }
 
+const logout = async (username) => {
+  username = validate(getUserValidation, username);
+  return await prismaClient.user.update({
+    where: {
+      username: username
+    },
+    data: {
+      token: null,
+    },
+    select: {
+      username: true,
+    }
+  });
+}
+
 export default {
   register,
   login,
   get,
   update,
+  logout,
 }

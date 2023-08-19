@@ -287,3 +287,53 @@ describe('PATCH /api/users/current', () => {
     expect(result.body.errors).toBeDefined();
   });
 });
+
+describe('DELETE /api/users/logout', () => {
+  beforeAll(async () => {
+    await createTestUser();
+  });
+
+  afterAll(async () => {
+    await removeTestUser();
+  });
+
+  it('should can logout', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+    const token = result.body.data.token;
+    
+    expect(result.status).toBe(200);
+    expect(token).toBeDefined();
+  
+    result = await supertest(web)
+      .delete('/api/users/logout')
+      .set('Authorization', token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBeDefined();
+    expect(result.body.data).toBe('OK');
+
+    result = await supertest(web)
+    .get('/api/users/current')
+    .set('Authorization', token);
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+
+    const currentUser = await getTestUser();
+    expect(currentUser.token).toBeNull();
+  });
+
+  it('should reject logout if token is invalid', async () => {
+    const result = await supertest(web)
+      .delete('/api/users/logout')
+      .set('Authorization', 'invalidtoken');
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+});
