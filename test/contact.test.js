@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { createTestUser, removeTestContact, removeTestUser } from "./utils/test-util.js";
+import { createTestContact, createTestUser, getTestContact, removeTestContact, removeTestUser } from "./utils/test-util.js";
 import { web } from "../src/applications/web.js";
 
 describe('POST /api/contacts', () => {
@@ -33,7 +33,6 @@ describe('POST /api/contacts', () => {
         phone: '08282828282',
       });
 
-    console.info(result.body);
     expect(result.status).toBe(200);
     expect(result.body.data.id).toBeDefined();
     expect(result.body.data.first_name).toBe('John');
@@ -93,6 +92,100 @@ describe('POST /api/contacts', () => {
       .post('/api/contacts')
       .set('Authorization','invalidtoken')
       .send({});
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+});
+
+describe('GET /api/contacts/:contactId', () => {
+  beforeAll(async () => {
+    await createTestUser();
+    await createTestContact();
+  });
+
+  afterAll(async () => {
+    await removeTestContact();
+    await removeTestUser();
+  });
+
+  it('should can get contact', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+    
+    const currentContact = await getTestContact();
+    result = await supertest(web)
+      .get(`/api/contacts/${currentContact.id}`)
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.id).toBeDefined();
+    expect(result.body.data.first_name).toBe('John');
+    expect(result.body.data.last_name).toBe('Doe');
+    expect(result.body.data.email).toBe('johndoe@mail.com');
+    expect(result.body.data.phone).toBe('0822222222');
+  });
+
+  it('should return 404 if contact id not found', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    result = await supertest(web)
+      .get(`/api/contacts/${currentContact.id + 1}`)
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.errors).toBe('Contact not found');
+  });
+
+  it('should reject get contact if contact id not a number', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+    
+    result = await supertest(web)
+      .get(`/api/contacts/abc`)
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(422);
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it('should reject get contact without token', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+    
+    result = await supertest(web)
+      .get(`/api/contacts/abc`);
 
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
