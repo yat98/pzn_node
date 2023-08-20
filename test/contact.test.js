@@ -191,3 +191,143 @@ describe('GET /api/contacts/:contactId', () => {
     expect(result.body.errors).toBeDefined();
   });
 });
+
+describe('PUT /api/contacts/:contactId', () => {
+  beforeAll(async () => {
+    await createTestUser();
+    await createTestContact();
+  });
+
+  afterAll(async () => {
+    await removeTestContact();
+    await removeTestUser();
+  });
+
+  it('should can update contact', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();    
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}`)
+      .set('Authorization', result.body.data.token)
+      .send({
+        id: currentContact.id,
+        first_name: 'John Update',
+        last_name: 'Doe Update',
+        email: 'johndoeupdate@mail.com',
+        phone: '080808080'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.id).toBe(currentContact.id);
+    expect(result.body.data.first_name).toBe('John Update');
+    expect(result.body.data.last_name).toBe('Doe Update');
+    expect(result.body.data.email).toBe('johndoeupdate@mail.com');
+    expect(result.body.data.phone).toBe('080808080');
+  });
+
+  it('should can update contact only required request', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();    
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}`)
+      .set('Authorization', result.body.data.token)
+      .send({
+        id: currentContact.id,
+        first_name: 'John',
+      });
+    
+    expect(result.status).toBe(200);
+    expect(result.body.data.id).toBe(currentContact.id);
+    expect(result.body.data.first_name).toBe('John');
+  });
+
+  it('should can reject update contact', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();    
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}`)
+      .set('Authorization', result.body.data.token)
+      .send({});
+
+    expect(result.status).toBe(422);
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it('should return 404 update contact if contact not found', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();    
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id + 1}`)
+      .set('Authorization', result.body.data.token)
+      .send({
+        id: (currentContact.id + 1),
+        first_name: 'John',
+      });
+    
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.errors).toBe('Contact not found');
+  });
+
+  it('should can reject update contact without token', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();    
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}`)
+      .send({
+        id: currentContact.id,
+        first_name: 'John Update',
+        last_name: 'Doe Update',
+        email: 'johndoeupdate@mail.com',
+        phone: '080808080'
+      });
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+});

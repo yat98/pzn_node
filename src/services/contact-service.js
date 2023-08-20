@@ -1,6 +1,6 @@
 import { prismaClient } from "../applications/database.js";
 import { ResponseError } from "../errors/response-error.js";
-import { createContactValidation, getContactValidation } from "../validations/contact-validation.js";
+import { createContactValidation, getContactValidation, updateContactValidation } from "../validations/contact-validation.js";
 import { validate } from "../validations/validation.js"
 
 const create = async (user, req) => {
@@ -40,7 +40,37 @@ const get = async (user, contactId) => {
   return contact;
 }
 
+const update = async (user, req) => {
+  const updateRequest = validate(updateContactValidation, req);
+  const countContact = await prismaClient.contact.count({
+    where: {
+      username: user.username,
+      id: req.id
+    }
+  });
+
+  if(countContact < 1) {
+    throw new ResponseError(404, 'Contact not found');
+  }
+
+  return prismaClient.contact.update({
+    data: updateRequest,
+    where: {
+      username: user.username,
+      id: req.id
+    },
+    select: {
+      id: true,
+      first_name: true,
+      last_name: true,
+      email: true,
+      phone: true,
+    }
+  })
+}
+
 export default{
   create,
   get,
+  update,
 }

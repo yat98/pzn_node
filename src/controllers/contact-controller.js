@@ -24,7 +24,23 @@ const get = async (req,res,next) => {
   }
 }
 
+const update = async (req,res,next) => {
+  try {
+    const user = req.user;
+    const request = req.body;
+    request.id = parseInt(req.params.contactId);
+
+    const result = await contactService.update(user, request);
+    res.status(200).json({
+      data: result
+    }).end();
+  } catch (e) {
+    next(e);
+  }
+}
+
 export default {
   create,
   get,
+  update,
 }
