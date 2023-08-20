@@ -331,3 +331,71 @@ describe('PUT /api/contacts/:contactId', () => {
     expect(result.body.errors).toBeDefined();
   });
 });
+
+describe('DELETE /api/contacts/:contactId', () => {
+  beforeAll(async () => {
+    await createTestUser();
+  });
+
+  afterAll(async () => {
+    await removeTestContact();
+    await removeTestUser();
+  });
+
+  beforeEach(async () => {
+    await createTestContact();
+  })
+
+  it('should can remove contact', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    let currentContact = await getTestContact();    
+    result = await supertest(web)
+      .delete(`/api/contacts/${currentContact.id}`)
+      .set('Authorization', result.body.data.token)
+
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBe('OK');
+
+    currentContact = await getTestContact();    
+    expect(currentContact).toBeNull();
+  });
+
+  it('should return 404 if contact not found', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();    
+    result = await supertest(web)
+      .delete(`/api/contacts/${currentContact.id + 1}`)
+      .set('Authorization', result.body.data.token)
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.errors).toBe('Contact not found');
+  });
+
+  it('should reject remove contact without token', async () => {
+    const currentContact = await getTestContact();    
+    const result = await supertest(web)
+      .delete(`/api/contacts/${currentContact.id + 1}`);
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+});
