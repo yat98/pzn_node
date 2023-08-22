@@ -28,7 +28,7 @@ const update = async (req,res,next) => {
   try {
     const user = req.user;
     const request = req.body;
-    request.id = parseInt(req.params.contactId);
+    request.id = req.params.contactId;
 
     const result = await contactService.update(user, request);
     res.status(200).json({
@@ -43,9 +43,30 @@ const remove = async (req,res,next) => {
   try {
     const user = req.user;
 
-    const result = await contactService.remove(user, parseInt(req.params.contactId));
+    await contactService.remove(user, req.params.contactId);
     res.status(200).json({
       data: 'OK'
+    }).end();
+  } catch (e) {
+    next(e);
+  }
+}
+
+const search = async (req,res,next) => {
+  try {
+    const user = req.user;
+    const request = {
+      name: req.query.name,
+      email: req.query.email,
+      phone: req.query.phone,
+      page: req.query.page,
+      size: req.query.size,
+    }
+    console.info(request);
+    const result = await contactService.search(user, request);
+    res.status(200).json({
+      data: result.data,
+      paging: result.paging
     }).end();
   } catch (e) {
     next(e);
@@ -57,4 +78,5 @@ export default {
   get,
   update,
   remove,
+  search,
 }

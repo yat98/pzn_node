@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { createTestContact, createTestUser, getTestContact, removeTestContact, removeTestUser } from "./utils/test-util.js";
+import { createManyTestContact, createTestContact, createTestUser, getTestContact, removeTestContact, removeTestUser } from "./utils/test-util.js";
 import { web } from "../src/applications/web.js";
 
 describe('POST /api/contacts', () => {
@@ -396,6 +396,163 @@ describe('DELETE /api/contacts/:contactId', () => {
       .delete(`/api/contacts/${currentContact.id + 1}`);
 
     expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+});
+
+describe('GET /api/contacts', () => {
+  beforeAll(async () => {
+    await createTestUser();
+    await createManyTestContact();
+  });
+
+  afterAll(async () => {
+    await removeTestContact();
+    await removeTestUser();
+  });
+
+  it('should can search without parameter', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/contacts')
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBe(10);
+    expect(result.body.paging.page).toBe(1);
+    expect(result.body.paging.total_page).toBe(2);
+    expect(result.body.paging.total_item).toBe(15);
+  });
+
+  it('should can search to page 2', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/contacts')
+      .query({
+        page: 2
+      })
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBe(5);
+    expect(result.body.paging.page).toBe(2);
+    expect(result.body.paging.total_page).toBe(2);
+    expect(result.body.paging.total_item).toBe(15);
+  });
+
+  it('should can search using name', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/contacts')
+      .query({
+        name: 'John 1',
+      })
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBe(6);
+    expect(result.body.paging.page).toBe(1);
+    expect(result.body.paging.total_page).toBe(1);
+    expect(result.body.paging.total_item).toBe(6);
+  });
+
+  it('should can search using email', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/contacts')
+      .query({
+        email: 'johndoe1',
+      })
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBe(6);
+    expect(result.body.paging.page).toBe(1);
+    expect(result.body.paging.total_page).toBe(1);
+    expect(result.body.paging.total_item).toBe(6);
+  });
+
+  it('should can search using phone', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/contacts')
+      .query({
+        phone: '0822222221',
+      })
+      .set('Authorization', result.body.data.token);
+    
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBe(6);
+    expect(result.body.paging.page).toBe(1);
+    expect(result.body.paging.total_page).toBe(1);
+    expect(result.body.paging.total_item).toBe(6);
+  });
+
+  it('should reject search using invalid request', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    result = await supertest(web)
+      .get('/api/contacts')
+      .query({
+        size: 500,
+        name: 'test',
+      })
+      .set('Authorization', result.body.data.token);
+      
+    expect(result.status).toBe(422);
     expect(result.body.errors).toBeDefined();
   });
 });
