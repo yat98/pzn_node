@@ -115,7 +115,7 @@ describe('POST /api/contacts/:contactId/addresses', () => {
         country: "Amet",
         postal_code: "123",
       });
-      
+
     expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();
     expect(result.body.errors).toBe('Contact not found');
@@ -526,6 +526,73 @@ describe('DELETE /api/contacts/:contactId/addresses/:addressId', () => {
     result = await supertest(web)
       .delete(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id}`);
 
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+});
+
+describe('GET /api/contacts/:contactId/addresses', () => {
+  beforeAll(async () => {
+    await createTestUser();
+    await createTestContact();
+    await createTestAddress();
+  });
+
+  afterAll(async () => {
+    await removeTestAddress();
+    await removeTestContact();
+    await removeTestUser();
+  });
+
+  it('should can get list address', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+
+    result = await supertest(web)
+      .get(`/api/contacts/${currentContact.id}/addresses`)
+      .set('Authorization', result.body.data.token);
+      
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBeDefined();
+    expect(result.body.data.length).toBe(1);
+  });
+
+  it('should return 404 when get list address', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+
+    result = await supertest(web)
+      .get(`/api/contacts/${currentContact.id + 1}/addresses`)
+      .set('Authorization', result.body.data.token);
+      
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it('should reject without token', async () => {
+    const currentContact = await getTestContact();
+
+    const result = await supertest(web)
+      .get(`/api/contacts/${currentContact.id}/addresses`);
+      
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
   });
