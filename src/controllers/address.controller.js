@@ -1,4 +1,4 @@
-const { default: addressService } = require("../services/address-service");
+import addressService from '../services/address-service.js'
 
 const create = async (req,res,next) => {
   try {
