@@ -64,6 +64,10 @@ const get = async (username) => {
   return prismaClient.user.findUnique({
     where: {
       username: username
+    },
+    select: {
+      username: true,
+      name: true,
     }
   });
 }
