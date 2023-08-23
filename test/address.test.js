@@ -246,3 +246,174 @@ describe('GET /api/contacts/:contactId/addresses/:addressId', () => {
     expect(result.body.errors).toBeDefined();
   });
 });
+
+describe('PUT /api/contacts/:contactId/addresses/:addressId', () => {
+  beforeAll(async () => {
+    await createTestUser();
+    await createTestContact();
+    await createTestAddress();
+  });
+
+  afterAll(async () => {
+    await removeTestAddress();
+    await removeTestContact();
+    await removeTestUser();
+  });
+
+  it('should can update address', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    const currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id}`)
+      .set('Authorization', result.body.data.token)
+      .send({
+        id: currentAddress.id,
+        street: "Lorem Update Road",
+        city: "Ipsum Update City",
+        province: "Sit Update Dolor",
+        country: "Amet Update",
+        postal_code: "1234",
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.id).toBeDefined();
+    expect(result.body.data.street).toBe('Lorem Update Road');
+    expect(result.body.data.city).toBe('Ipsum Update City');
+    expect(result.body.data.province).toBe('Sit Update Dolor');
+    expect(result.body.data.country).toBe('Amet Update');
+    expect(result.body.data.postal_code).toBe('1234');
+  });
+
+  it('should can update address only required request', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    const currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id}`)
+      .set('Authorization', result.body.data.token)
+      .send({
+        id: currentAddress.id,
+        country: "Amet Update 2",
+        postal_code: "12345",
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.id).toBeDefined();
+    expect(result.body.data.country).toBe('Amet Update 2');
+    expect(result.body.data.postal_code).toBe('12345');
+  });
+
+  it('should reject update address', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    const currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id}`)
+      .set('Authorization', result.body.data.token)
+      .send({});
+
+    expect(result.status).toBe(422);
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it('should return 404 if contact not found', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    const currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id + 1}/addresses/${currentAddress.id}`)
+      .set('Authorization', result.body.data.token)
+      .send({
+        id: currentAddress.id,
+        country: "Amet Update 2",
+        postal_code: "12345",
+      });
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it('should return 404 if address not found', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    const currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id + 1}`)
+      .set('Authorization', result.body.data.token)
+      .send({
+        id: currentAddress.id,
+        country: "Amet Update 2",
+        postal_code: "12345",
+      });
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it('should reject update without token', async () => {
+    const currentContact = await getTestContact();
+    const currentAddress = await getTestAddress();
+
+    const result = await supertest(web)
+      .put(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id}`)
+      .send({
+        id: currentAddress.id,
+        country: "Amet Update 2",
+        postal_code: "12345",
+      });
+
+    expect(result.status).toBe(401);   
+    expect(result.body.errors).toBeDefined();
+  });
+});
