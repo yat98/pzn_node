@@ -65,7 +65,7 @@ describe('POST /api/contacts/:contactId/addresses', () => {
         country: "Amet",
         postal_code: "123",
       });
-    console.info(result.body)
+
     expect(result.status).toBe(200);
     expect(result.body.data.id).toBeDefined();
     expect(result.body.data.street).toBeNull();
@@ -115,7 +115,7 @@ describe('POST /api/contacts/:contactId/addresses', () => {
         country: "Amet",
         postal_code: "123",
       });
-    console.info(JSON.stringify(result.body));
+      
     expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();
     expect(result.body.errors).toBe('Contact not found');
@@ -414,6 +414,119 @@ describe('PUT /api/contacts/:contactId/addresses/:addressId', () => {
       });
 
     expect(result.status).toBe(401);   
+    expect(result.body.errors).toBeDefined();
+  });
+});
+
+describe('DELETE /api/contacts/:contactId/addresses/:addressId', () => {
+  beforeAll(async () => {
+    await createTestUser();
+    await createTestContact();
+  });
+
+  afterAll(async () => {
+    await removeTestAddress();
+    await removeTestContact();
+    await removeTestUser();
+  });
+
+  beforeEach(async () => {
+    await createTestAddress();
+  });
+
+  afterEach(async () => {
+    await removeTestAddress();
+  });
+
+  it('should can remove address', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    let currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .delete(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id}`)
+      .set('Authorization', result.body.data.token);
+    
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBe('OK');
+    
+    currentAddress = await getTestAddress();
+    expect(currentAddress).toBeNull()
+  });
+
+  it('should return 404 if contact not found', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    let currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .delete(`/api/contacts/${currentContact.id + 1}/addresses/${currentAddress.id}`)
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.errors).toBe('Contact not found');
+  });
+
+  it('should return 404 if address not found', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    let currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .delete(`/api/contacts/${currentContact.id}/addresses/${(currentAddress.id + 2)}`)
+      .set('Authorization', result.body.data.token);
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.errors).toBe('Address not found');
+  });
+
+  it('should reject without token', async () => {
+    let result = await supertest(web)
+      .post('/api/users/login')
+      .send({
+        username: 'test',
+        password: 'rahasia'
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.token).toBeDefined();
+
+    const currentContact = await getTestContact();
+    let currentAddress = await getTestAddress();
+
+    result = await supertest(web)
+      .delete(`/api/contacts/${currentContact.id}/addresses/${currentAddress.id}`);
+
+    expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
   });
 });
