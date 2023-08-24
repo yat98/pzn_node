@@ -1,0 +1,40 @@
+{
+  "name": "belajar-nodejs-npm",
+  "version": "1.0.0",
+  "description": "Belajar NodeJS NPM",
+  "exports": {
+    ".": "./index.js",
+    "./write": "./write.js"
+  },
+  "scripts": {
+    "prestart": "echo \"Before application start\"",
+    "start": "node index.js",
+    "poststart": "echo \"After application start\"",
+    "run": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yat98/pzn_node.git"
+  },
+  "keywords": [
+    "programmerzamannow",
+    "pzn",
+    "nodejs",
+    "npm"
+  ],
+  "author": "Hidayat Chandra",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/yat98/pzn_node/issues"
+  },
+  "homepage": "https://github.com/yat98/pzn_node#readme",
+  "dependencies": {
+    "lodash": "~4.17.19",
+    "yat98-belajar-nodejs-npm-library": "^1.0.0"
+  },
+  "devDependencies": {
+    "moment": "^2.29.3"
+  }
+}
