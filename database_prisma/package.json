@@ -1,0 +1,30 @@
+{
+  "name": "belajar-nodejs-database",
+  "version": "1.0.0",
+  "description": "Belajar NodeJS Database",
+  "main": "index.js",
+  "type": "module",
+  "devDependencies": {
+    "@babel/preset-env": "^7.22.10",
+    "@types/jest": "^29.5.3",
+    "babel-jest": "^29.6.2",
+    "jest": "^29.6.2",
+    "prisma": "^5.1.1"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yat98/pzn_node.git"
+  },
+  "author": "Hidayat Chandra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yat98/pzn_node/issues"
+  },
+  "homepage": "https://github.com/yat98/pzn_node#readme",
+  "dependencies": {
+    "@prisma/client": "^5.1.1"
+  }
+}
